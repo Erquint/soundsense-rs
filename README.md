@@ -1,3 +1,6 @@
+# Fork of abandoned https://github.com/prixt/soundsense-rs in a dirty attempt to merge pending PRs, build and release binaries.
+Original README.md follows…
+
 # SOUNDSENSE-RS</br><img src="./icons/icon.ico" width="128px" height="128px"></img></br>Soundsense, written in Rust.</br>![Build](https://github.com/prixt/soundsense-rs/workflows/Build/badge.svg)
 My attempt at recreating [SoundSense](http://df.zweistein.cz/soundsense/), a sound-engine utility for [Dwarf Fortress](http://www.bay12games.com/dwarves/), using Rust.
 
