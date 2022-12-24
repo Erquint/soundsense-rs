@@ -1,45 +1,49 @@
-name: Build
+name: Release a new version
 
-on: push
+on:
+  pull_request:
+    branches: [$default-branch]
+    types:
+      - closed
 
 jobs:
-  build:
-    if: "!contains(github.event.head_commit.message, 'ci-skip') && contains(github.event.head_commit.message, 'ci-build')"
+  merged_build:
+    name: Merged build
+    if: github.event.pull_request.merged == true
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-    name: Build
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{matrix.os}}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@master
-      
-      - name: Install dependencies (Linux)
-        if: runner.os == 'Linux'
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: If patch
+        if: contains(github.event.head_commit.message, '!patch')
+        shell: pwsh
+        run: echo 'patch' > ./bump.tag
+      - name: If minor
+        if: contains(github.event.head_commit.message, '!minor')
+        shell: pwsh
+        run: echo 'minor' > ./bump.tag
+      - name: If major
+        if: contains(github.event.head_commit.message, '!major')
+        shell: pwsh
+        run: echo 'major' > ./bump.tag
+      - name: Update, build, tag and push back
+        shell: pwsh
         run: |
-          sudo apt update
-          sudo apt install -y libasound2-dev libgtk-3-dev libwebkit2gtk-4.0-dev
-      
-      - name: Cargo Update
-        uses: actions-rs/cargo@v1
+          cargo install cargo-edit
+          cargo set-version --bump (Get-Content -Path './bump.tag')
+          'v' + (Get-Content -Raw .\cargo.toml | Select-String -Pattern '(?s)\[package\].*?version = "(\d\.\d\.\d)"').Matches.Groups[1].Value > ./bump.tag
+          cargo update
+          cargo build --release --verbose
+          New-Item -ItemType Directory -Path ./artifacts/
+          Compress-Archive -Path './target/release/*' -DestinationPath ./artifacts/soundsense-rs-(Get-Content -Path './version.string')-${{runner.os}}.zip
+          git add cargo.toml
+          git commit -m ("Automated version bump to " (Get-Content -Path './version.string'))
+          git tag (Get-Content -Path './version.string')
+          git push --tags
+      - name: Release
+        uses: softprops/action-gh-release@v1
         with:
-          command: update
-      
-      - name: Cargo Build
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release --verbose
-      
-      - name: Upload Built Binary
-        if: runner.os != 'Windows'
-        uses: actions/upload-artifact@v1
-        with:
-          name: soundsense-rs-${{runner.os}}
-          path: target/release/soundsense-rs
-      - name: Upload Built Binary
-        if: runner.os == 'Windows'
-        uses: actions/upload-artifact@v1
-        with:
-          name: soundsense-rs-${{runner.os}}
-          path: target/release/soundsense-rs.exe
+          files: ./artifacts/*
