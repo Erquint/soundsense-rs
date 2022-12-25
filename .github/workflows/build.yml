@@ -2,7 +2,8 @@ name: Release a new version
 
 on:
   pull_request:
-    branches: [$default-branch]
+    branches:
+      - master
     types:
       - closed
 
