@@ -10,7 +10,7 @@ on:
 jobs:
   merged_build:
     name: Merged build
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: master
       - name: If patch
         if: contains(github.event.head_commit.message, '!patch')
         shell: pwsh
@@ -39,9 +41,9 @@ jobs:
           cargo update
           cargo build --release --verbose
           New-Item -ItemType Directory -Path ./artifacts/
-          Compress-Archive -Path './target/release/*' -DestinationPath ./artifacts/soundsense-rs-(Get-Content -Path './version.string')-${{runner.os}}.zip
+          Compress-Archive -Path './target/release/*' -DestinationPath './artifacts/soundsense-rs-' + (Get-Content -Path './version.string') + '-${{runner.os}}.zip'
           git add cargo.toml
-          git commit -m ("Automated version bump to " (Get-Content -Path './version.string'))
+          git commit -m ("Automated version bump to " + (Get-Content -Path './version.string'))
           git tag (Get-Content -Path './version.string')
           git push --tags
       - name: Release
