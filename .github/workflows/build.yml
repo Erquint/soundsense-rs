@@ -1,5 +1,9 @@
 name: Release a new version
 
+defaults:
+  run:
+    shell: pwsh
+
 on:
   pull_request:
     branches:
@@ -15,37 +19,53 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{matrix.os}}
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           ref: master
+      
       - name: If patch
         if: contains(github.event.head_commit.message, '!patch')
-        shell: pwsh
         run: echo 'patch' > ./bump.tag
+      
       - name: If minor
         if: contains(github.event.head_commit.message, '!minor')
-        shell: pwsh
         run: echo 'minor' > ./bump.tag
+      
       - name: If major
         if: contains(github.event.head_commit.message, '!major')
-        shell: pwsh
         run: echo 'major' > ./bump.tag
-      - name: Update, build, tag and push back
-        shell: pwsh
+      
+      - name: Bump version
         run: |
           cargo install cargo-edit
           cargo set-version --bump (Get-Content -Path './bump.tag')
           'v' + (Get-Content -Raw .\cargo.toml | Select-String -Pattern '(?s)\[package\].*?version = "(\d\.\d\.\d)"').Matches.Groups[1].Value > ./bump.tag
-          cargo update
-          cargo build --release --verbose
-          New-Item -ItemType Directory -Path ./artifacts/
+      
+      - name: Update
+        run: cargo update
+      
+      - name: Build
+        run: cargo build --release --verbose
+      
+      - name: Package
+        run: |
+          New-Item -ItemType Directory -Path ./artifacts/; 
           Compress-Archive -Path './target/release/*' -DestinationPath './artifacts/soundsense-rs-' + (Get-Content -Path './version.string') + '-${{runner.os}}.zip'
+      
+      - name: Commit
+        run: |
           git add cargo.toml
           git commit -m ("Automated version bump to " + (Get-Content -Path './version.string'))
-          git tag (Get-Content -Path './version.string')
-          git push --tags
+      
+      - name: Tag
+        run: git tag (Get-Content -Path './version.string')
+      
+      - name: Push back
+        run: git push --tags
+      
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
