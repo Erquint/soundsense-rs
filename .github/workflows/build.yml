@@ -30,12 +30,12 @@ jobs:
           RUNNER_CONTEXT: ${{toJson(runner)}}
           INPUTS_CONTEXT: ${{toJson(inputs)}}
         run: |
-          echo 'GITHUB_CONTEXT:' + $env:GITHUB_CONTEXT
-          echo 'ENV_CONTEXT:' + $env:ENV_CONTEXT
-          echo 'JOB_CONTEXT:' + $env:JOB_CONTEXT
-          echo 'STEPS_CONTEXT:' + $env:STEPS_CONTEXT
-          echo 'RUNNER_CONTEXT:' + $env:RUNNER_CONTEXT
-          echo 'INPUTS_CONTEXT:' + $env:INPUTS_CONTEXT
+          echo ('"github": ' + $env:GITHUB_CONTEXT)
+          echo ('"env": ' + $env:ENV_CONTEXT)
+          echo ('"job": ' + $env:JOB_CONTEXT)
+          echo ('"steps": ' + $env:STEPS_CONTEXT)
+          echo ('"runner": ' + $env:RUNNER_CONTEXT)
+          echo ('"inputs": ' + $env:INPUTS_CONTEXT)
       
       - name: If patch
         if: contains(github.event.head_commit.message, '!patch')
