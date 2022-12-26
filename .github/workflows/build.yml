@@ -51,7 +51,7 @@ jobs:
       
       - name: Read bump tag
         run: |
-          echo ((Test-Path ./bump.tag) ? (Get-Content ./bump.tag) : "::setFailed './bump.tag not found'")
+          echo ((Test-Path ./bump.tag) ? (Get-Content ./bump.tag) : (exit 1))
       
       - name: Checkout
         uses: actions/checkout@v3
