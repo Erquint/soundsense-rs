@@ -25,10 +25,10 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{toJson(github)}}
           ENV_CONTEXT: ${{toJson(env)}}
-          JOB_CONTEXT: ${{job}}
-          STEPS_CONTEXT: ${{steps}}
-          RUNNER_CONTEXT: ${{runner}}
-          INPUTS_CONTEXT: ${{inputs}}
+          JOB_CONTEXT: ${{toJson(job)}}
+          STEPS_CONTEXT: ${{toJson(steps)}}
+          RUNNER_CONTEXT: ${{toJson(runner)}}
+          INPUTS_CONTEXT: ${{toJson(inputs)}}
         run: |
           echo 'GITHUB_CONTEXT:' + $env:GITHUB_CONTEXT
           echo 'ENV_CONTEXT:' + $env:ENV_CONTEXT
@@ -50,7 +50,8 @@ jobs:
         run: echo 'major' > ./bump.tag
       
       - name: Read bump tag
-        run: echo ((Test-Path ./bump.tag) ? (Get-Content ./bump.tag) : '::setFailed')
+        run: |
+          echo ((Test-Path ./bump.tag) ? (Get-Content ./bump.tag) : '::setFailed')
       
       - name: Checkout
         uses: actions/checkout@v3
