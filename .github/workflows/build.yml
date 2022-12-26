@@ -7,7 +7,7 @@ defaults:
 on:
   pull_request:
     branches:
-      - master
+      - ${{github.base_ref}}
     types:
       - closed
 
@@ -21,10 +21,21 @@ jobs:
     runs-on: ${{matrix.os}}
     
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: master
+      - name: Debug
+        env:
+          GITHUB_CONTEXT: ${{toJson(github)}}
+          ENV_CONTEXT: ${{toJson(env)}}
+          JOB_CONTEXT: ${{job}}
+          STEPS_CONTEXT: ${{steps}}
+          RUNNER_CONTEXT: ${{runner}}
+          INPUTS_CONTEXT: ${{inputs}}
+        run: |
+          echo 'GITHUB_CONTEXT:' + $env:GITHUB_CONTEXT
+          echo 'ENV_CONTEXT:' + $env:ENV_CONTEXT
+          echo 'JOB_CONTEXT:' + $env:JOB_CONTEXT
+          echo 'STEPS_CONTEXT:' + $env:STEPS_CONTEXT
+          echo 'RUNNER_CONTEXT:' + $env:RUNNER_CONTEXT
+          echo 'INPUTS_CONTEXT:' + $env:INPUTS_CONTEXT
       
       - name: If patch
         if: contains(github.event.head_commit.message, '!patch')
@@ -37,6 +48,14 @@ jobs:
       - name: If major
         if: contains(github.event.head_commit.message, '!major')
         run: echo 'major' > ./bump.tag
+      
+      - name: Read bump tag
+        run: echo ((Test-Path ./bump.tag) ? (Get-Content ./bump.tag) : '::setFailed')
+      
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{github.base_ref}}
       
       - name: Bump version
         run: |
