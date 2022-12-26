@@ -50,8 +50,7 @@ jobs:
         run: echo 'major' > ./bump.tag
       
       - name: Read bump tag
-        run: |
-          echo ((Test-Path ./bump.tag) ? (Get-Content ./bump.tag) : (exit 1))
+        run: If (Test-Path ./bump.tag) {Get-Content ./bump.tag} Else {Exit(1)}
       
       - name: Checkout
         uses: actions/checkout@v3
