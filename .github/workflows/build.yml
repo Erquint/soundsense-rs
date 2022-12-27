@@ -25,22 +25,22 @@ jobs:
         run: |
           echo ('"github": ' + @'
           ${{github}}
-          '@
+          '@)
           echo ('"env": ' + @'
           ${{env}}
-          '@
+          '@)
           echo ('"job": ' + @'
           ${{job}}
-          '@
+          '@)
           echo ('"steps": ' + @'
           ${{steps}}
-          '@
+          '@)
           echo ('"runner": ' + @'
           ${{runner}}
-          '@
+          '@)
           echo ('"inputs": ' + @'
           ${{inputs}}
-          '@
+          '@)
           Get-ChildItem env:
       
       - name: If patch
