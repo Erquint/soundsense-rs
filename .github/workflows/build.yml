@@ -28,7 +28,7 @@ jobs:
         run: |
           # Debug
           git show --pretty=%B
-          [Environment]::SetEnvironmentVariable('COMMIT_MESSAGE', (git show --pretty=%B), [EnvironmentVariableTarget]::User)
+          [Environment]::SetEnvironmentVariable('COMMIT_MESSAGE', (git show --no-patch --pretty=%s%n%b), [EnvironmentVariableTarget]::User)
           # Debug
           [Environment]::GetEnvironmentVariable('COMMIT_MESSAGE', [EnvironmentVariableTarget]::User)
           if ([Environment]::GetEnvironmentVariable('COMMIT_MESSAGE', [EnvironmentVariableTarget]::User) -match '!major') {
