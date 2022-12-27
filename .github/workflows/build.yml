@@ -32,11 +32,11 @@ jobs:
         run: |
           $COMMIT_MESSAGE = (git show --no-patch --pretty=%s%n%b)
           $GUID = (New-Guid).Guid
-          "COMMIT_MESSAGE<<${$GUID}" >> Env:GITHUB_ENV
-          foreach ($line in (Get-Content .\file.txt)) {
-            "${$COMMIT_MESSAGE}" >> Env:GITHUB_ENV
+          Append-Content -Path $env:GITHUB_ENV -Value "COMMIT_MESSAGE<<${$GUID}"
+          foreach ($line in $COMMIT_MESSAGE) {
+            Append-Content -Path $env:GITHUB_ENV -Value $line
           }
-          "${$GUID}" >> Env:GITHUB_ENV
+          Append-Content -Path $env:GITHUB_ENV -Value $GUID
           if       ($COMMIT_MESSAGE -match '!major') {
             $BUMP_TAG = 'major'
           } elseif ($COMMIT_MESSAGE -match '!minor') {
@@ -44,13 +44,13 @@ jobs:
           } elseif ($COMMIT_MESSAGE -match '!patch') {
             $BUMP_TAG = 'patch'
           } else {Exit(1)}
-          "BUMP_TAG=${$BUMP_TAG}" >> Env:GITHUB_ENV
+          Append-Content -Path $env:GITHUB_ENV -Value "BUMP_TAG=${$BUMP_TAG}"
       
       - name: Bump version
         run: |
           cargo install cargo-edit
-          cargo set-version --bump (Get-Content -Path Env:BUMP_TAG)
-          "VERSION_STRING=${'v' + (Get-Content -Raw .\cargo.toml | Select-String -Pattern '(?s)\[package\].*?version = "(\d\.\d\.\d)"').Matches.Groups[1].Value}" >> Env:GITHUB_ENV
+          cargo set-version --bump $env:BUMP_TAG
+          Append-Content -Path $env:GITHUB_ENV -Value "VERSION_STRING=${'v' + (Get-Content -Raw .\cargo.toml | Select-String -Pattern '(?s)\[package\].*?version = "(\d\.\d\.\d)"').Matches.Groups[1].Value}"
       
       - name: Update
         run: cargo update
@@ -61,15 +61,15 @@ jobs:
       - name: Package
         run: |
           New-Item -ItemType Directory -Path ./artifacts/; 
-          Compress-Archive -Path './target/release/*' -DestinationPath './artifacts/soundsense-rs-' + (Get-Content -Path Env:VERSION_STRING) + '-${{runner.os}}.zip'
+          Compress-Archive -Path './target/release/*' -DestinationPath './artifacts/soundsense-rs-' + $env:VERSION_STRING + '-${{runner.os}}.zip'
       
       - name: Commit
         run: |
           git add cargo.toml
-          git commit -m ("Automated version bump to " + (Get-Content -Path Env:VERSION_STRING))
+          git commit -m ("Automated version bump to " + $env:VERSION_STRING)
       
       - name: Tag
-        run: git tag (Get-Content -Path Env:VERSION_STRING)
+        run: git tag $env:VERSION_STRING
       
       - name: Push back
         run: git push --tags
