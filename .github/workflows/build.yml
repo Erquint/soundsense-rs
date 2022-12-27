@@ -26,20 +26,19 @@ jobs:
       
       - name: Get bump tag
         run: |
-          Set-Content -Path Env:COMMIT_MESSAGE -Value (git show --pretty=%B)
           if ((Get-Content -Path Env:COMMIT_MESSAGE) -match '!major') {
-            Set-Content -Path Env:BUMP_TAG -Value 'major'
+            [Environment]::SetEnvironmentVariable('BUMP_TAG, 'major', [EnvironmentVariableTarget]::User)
           } elseif ((Get-Content -Path Env:COMMIT_MESSAGE) -match '!minor') {
-            Set-Content -Path Env:BUMP_TAG -Value 'minor'
+            [Environment]::SetEnvironmentVariable('BUMP_TAG, 'minor', [EnvironmentVariableTarget]::User)
           } elseif ((Get-Content -Path Env:COMMIT_MESSAGE) -match '!patch') {
-            Set-Content -Path Env:BUMP_TAG -Value 'patch'
+            [Environment]::SetEnvironmentVariable('BUMP_TAG, 'patch', [EnvironmentVariableTarget]::User)
           } else {Exit(1)}
       
       - name: Bump version
         run: |
           cargo install cargo-edit
           cargo set-version --bump (Get-Content -Path Env:BUMP_TAG)
-          Set-Content -Path Env:VERSION_STRING -Value ('v' + (Get-Content -Raw .\cargo.toml | Select-String -Pattern '(?s)\[package\].*?version = "(\d\.\d\.\d)"').Matches.Groups[1].Value)
+          [Environment]::SetEnvironmentVariable('VERSION_STRING, ('v' + (Get-Content -Raw .\cargo.toml | Select-String -Pattern '(?s)\[package\].*?version = "(\d\.\d\.\d)"').Matches.Groups[1].Value), [EnvironmentVariableTarget]::User)
       
       - name: Update
         run: cargo update
@@ -49,7 +48,7 @@ jobs:
       
       - name: Package
         run: |
-          New-Item -ItemType Directory -Path ./artifacts/
+          New-Item -ItemType Directory -Path ./artifacts/; 
           Compress-Archive -Path './target/release/*' -DestinationPath './artifacts/soundsense-rs-' + (Get-Content -Path Env:VERSION_STRING) + '-${{runner.os}}.zip'
       
       - name: Commit
