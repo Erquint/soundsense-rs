@@ -1,3 +1,7 @@
+# ToDo:
+#   https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions?tool=powershell#setting-an-output-parameter
+#   https://github.com/wraithan/cargo-bump
+
 name: Release a new version
 
 defaults:
@@ -26,26 +30,23 @@ jobs:
       
       - name: Get bump tag
         run: |
-          echo 'debug1>'
-          git show --no-patch --pretty=%s%n%b
-          echo '<debug1'
-          echo 'debug2>'
-          [Environment]::SetEnvironmentVariable('COMMIT_MESSAGE', (git show --no-patch --pretty=%s%n%b), [EnvironmentVariableTarget]::User)
-          echo '<debug2'
-          [Environment]::GetEnvironmentVariable('COMMIT_MESSAGE', [EnvironmentVariableTarget]::User)
-          if ([Environment]::GetEnvironmentVariable('COMMIT_MESSAGE', [EnvironmentVariableTarget]::User) -match '!major') {
-            [Environment]::SetEnvironmentVariable('BUMP_TAG', 'major', [EnvironmentVariableTarget]::User)
-          } elseif ([Environment]::GetEnvironmentVariable('COMMIT_MESSAGE', [EnvironmentVariableTarget]::User) -match '!minor') {
-            [Environment]::SetEnvironmentVariable('BUMP_TAG', 'minor', [EnvironmentVariableTarget]::User)
-          } elseif ([Environment]::GetEnvironmentVariable('COMMIT_MESSAGE', [EnvironmentVariableTarget]::User) -match '!patch') {
-            [Environment]::SetEnvironmentVariable('BUMP_TAG', 'patch', [EnvironmentVariableTarget]::User)
+          $COMMIT_MESSAGE = (git show --no-patch --pretty=%s%n%b)
+          $GUID = (New-Guid).Guid
+          Add-Content -Path Env:GITHUB_ENV -Value "COMMIT_MESSAGE<<${$GUID}`n${$COMMIT_MESSAGE}`n${$GUID}"
+          if       ($COMMIT_MESSAGE -match '!major') {
+            $BUMP_TAG = 'major'
+          } elseif ($COMMIT_MESSAGE -match '!minor') {
+            $BUMP_TAG = 'minor'
+          } elseif ($COMMIT_MESSAGE -match '!patch') {
+            $BUMP_TAG = 'patch'
           } else {Exit(1)}
+          Add-Content -Path Env:GITHUB_ENV -Value "BUMP_TAG=${$BUMP_TAG}"
       
       - name: Bump version
         run: |
           cargo install cargo-edit
           cargo set-version --bump (Get-Content -Path Env:BUMP_TAG)
-          [Environment]::SetEnvironmentVariable('VERSION_STRING', ('v' + (Get-Content -Raw .\cargo.toml | Select-String -Pattern '(?s)\[package\].*?version = "(\d\.\d\.\d)"').Matches.Groups[1].Value), [EnvironmentVariableTarget]::User)
+          Add-Content -Path Env:GITHUB_ENV -Value "VERSION_STRING=${'v' + (Get-Content -Raw .\cargo.toml | Select-String -Pattern '(?s)\[package\].*?version = "(\d\.\d\.\d)"').Matches.Groups[1].Value}"
       
       - name: Update
         run: cargo update
@@ -73,3 +74,4 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: ./artifacts/*
+          body: ${{env.COMMIT_MESSAGE}}
