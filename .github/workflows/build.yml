@@ -68,7 +68,7 @@ jobs:
       - name: Package
         run: |
           New-Item -ItemType Directory -Path ./artifacts/; 
-          Compress-Archive -Path './target/release/*' -DestinationPath './artifacts/soundsense-rs-' + $env:VERSION_STRING + '-${{runner.os}}.zip'
+          Compress-Archive -Path './target/release/*' -DestinationPath ('./artifacts/soundsense-rs-' + $env:VERSION_STRING + '-${{runner.os}}.zip')
       
       - name: Commit
         run: |
