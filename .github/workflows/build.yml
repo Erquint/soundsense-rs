@@ -32,7 +32,11 @@ jobs:
         run: |
           $COMMIT_MESSAGE = (git show --no-patch --pretty=%s%n%b)
           $GUID = (New-Guid).Guid
-          "COMMIT_MESSAGE<<${$GUID}`n${$COMMIT_MESSAGE}`n${$GUID}" >> Env:GITHUB_ENV
+          "COMMIT_MESSAGE<<${$GUID}" >> Env:GITHUB_ENV
+          foreach ($line in (Get-Content .\file.txt)) {
+            "${$COMMIT_MESSAGE}" >> Env:GITHUB_ENV
+          }
+          "${$GUID}" >> Env:GITHUB_ENV
           if       ($COMMIT_MESSAGE -match '!major') {
             $BUMP_TAG = 'major'
           } elseif ($COMMIT_MESSAGE -match '!minor') {
