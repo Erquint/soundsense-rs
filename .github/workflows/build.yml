@@ -25,7 +25,7 @@ jobs:
     runs-on: ${{matrix.os}}
     
     steps:
-      - name: Debug
+      - name: Debug1
         run: Test-Path Cargo.toml
       
       - name: Checkout
@@ -49,7 +49,7 @@ jobs:
           } else {Exit(1)}
           Add-Content -Path $env:GITHUB_ENV -Value "BUMP_TAG=${BUMP_TAG}"
       
-      - name: Debug
+      - name: Debug2
         run: Test-Path Cargo.toml
       
       - name: Bump version
