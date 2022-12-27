@@ -73,6 +73,7 @@ jobs:
       - name: Commit
         run: |
           git add Cargo.toml
+          git config --global user.name "A GitHub Workflow Runner"
           git commit -m ("Automated version bump to " + $env:VERSION_STRING)
       
       - name: Tag
