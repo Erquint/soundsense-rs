@@ -85,5 +85,6 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ./artifacts/*
+          tag_name: ${{env.BUMP_TAG}}
           body: ${{env.COMMIT_MESSAGE}}
+          files: ./artifacts/*
