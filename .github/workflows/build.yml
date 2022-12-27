@@ -25,6 +25,9 @@ jobs:
     runs-on: ${{matrix.os}}
     
     steps:
+      - name: Debug
+        run: Test-Path Cargo.toml
+      
       - name: Checkout
         uses: actions/checkout@v3
       
@@ -46,12 +49,15 @@ jobs:
           } else {Exit(1)}
           Add-Content -Path $env:GITHUB_ENV -Value "BUMP_TAG=${BUMP_TAG}"
       
+      - name: Debug
+        run: Test-Path Cargo.toml
+      
       - name: Bump version
         run: |
           cargo install cargo-edit
           cargo set-version --bump $env:BUMP_TAG
           $PATTERN = '(?s)\[package\].*?version = "(\d\.\d\.\d)"'
-          Add-Content -Path $env:GITHUB_ENV -Value ('VERSION_STRING=' + "v$((Get-Content -Raw -Path ./cargo.toml | Select-String -Pattern ${PATTERN}).Matches.Groups[1].Value)")
+          Add-Content -Path $env:GITHUB_ENV -Value ('VERSION_STRING=' + "v$((Get-Content -Raw -Path Cargo.toml | Select-String -Pattern ${PATTERN}).Matches.Groups[1].Value)")
       
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
