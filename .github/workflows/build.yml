@@ -23,12 +23,12 @@ jobs:
     steps:
       - name: Debug
         env:
-          GITHUB_CONTEXT: ${{toJson(github)}}
-          ENV_CONTEXT: ${{toJson(env)}}
-          JOB_CONTEXT: ${{toJson(job)}}
-          STEPS_CONTEXT: ${{toJson(steps)}}
-          RUNNER_CONTEXT: ${{toJson(runner)}}
-          INPUTS_CONTEXT: ${{toJson(inputs)}}
+          GITHUB_CONTEXT: ${{github}}
+          ENV_CONTEXT: ${{env}}
+          JOB_CONTEXT: ${{job}}
+          STEPS_CONTEXT: ${{steps}}
+          RUNNER_CONTEXT: ${{runner}}
+          INPUTS_CONTEXT: ${{inputs}}
         run: |
           echo ('"github": ' + $env:GITHUB_CONTEXT)
           echo ('"env": ' + $env:ENV_CONTEXT)
@@ -36,6 +36,7 @@ jobs:
           echo ('"steps": ' + $env:STEPS_CONTEXT)
           echo ('"runner": ' + $env:RUNNER_CONTEXT)
           echo ('"inputs": ' + $env:INPUTS_CONTEXT)
+          Get-ChildItem env:
       
       - name: If patch
         if: contains(github.event.head_commit.message, '!patch')
