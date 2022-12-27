@@ -26,10 +26,12 @@ jobs:
       
       - name: Get bump tag
         run: |
-          # Debug
-          git show --pretty=%B
+          echo debug1>
+          git show --no-patch --pretty=%s%n%b
+          echo <debug1
+          echo debug2>
           [Environment]::SetEnvironmentVariable('COMMIT_MESSAGE', (git show --no-patch --pretty=%s%n%b), [EnvironmentVariableTarget]::User)
-          # Debug
+          echo <debug2
           [Environment]::GetEnvironmentVariable('COMMIT_MESSAGE', [EnvironmentVariableTarget]::User)
           if ([Environment]::GetEnvironmentVariable('COMMIT_MESSAGE', [EnvironmentVariableTarget]::User) -match '!major') {
             [Environment]::SetEnvironmentVariable('BUMP_TAG', 'major', [EnvironmentVariableTarget]::User)
