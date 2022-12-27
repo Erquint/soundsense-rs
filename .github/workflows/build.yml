@@ -53,6 +53,12 @@ jobs:
           $PATTERN = '(?s)\[package\].*?version = "(\d\.\d\.\d)"'
           Add-Content -Path $env:GITHUB_ENV -Value ('VERSION_STRING=' + 'v$((Get-Content -Raw .\cargo.toml | Select-String -Pattern ${PATTERN}).Matches.Groups[1].Value)')
       
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt update
+          sudo apt install -y libasound2-dev libgtk-3-dev libwebkit2gtk-4.0-dev
+      
       - name: Update
         run: cargo update
       
