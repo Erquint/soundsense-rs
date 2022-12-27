@@ -51,7 +51,7 @@ jobs:
           cargo install cargo-edit
           cargo set-version --bump $env:BUMP_TAG
           $PATTERN = '(?s)\[package\].*?version = "(\d\.\d\.\d)"'
-          Add-Content -Path $env:GITHUB_ENV -Value 'VERSION_STRING=' + 'v$((Get-Content -Raw .\cargo.toml | Select-String -Pattern ${PATTERN}).Matches.Groups[1].Value)'
+          Add-Content -Path $env:GITHUB_ENV -Value ('VERSION_STRING=' + 'v$((Get-Content -Raw .\cargo.toml | Select-String -Pattern ${PATTERN}).Matches.Groups[1].Value)')
       
       - name: Update
         run: cargo update
