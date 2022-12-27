@@ -26,12 +26,12 @@ jobs:
       
       - name: Get bump tag
         run: |
-          [Environment]::SetEnvironmentVariable('COMMIT_MESSAGE', (git show --pretty=%B), [EnvironmentVariableTarget]::Machine)
-          if ((Get-Content -Path Env:COMMIT_MESSAGE) -match '!major') {
+          [Environment]::SetEnvironmentVariable('COMMIT_MESSAGE', (git show --pretty=%B), [EnvironmentVariableTarget]::User)
+          if ([Environment]::GetEnvironmentVariable('COMMIT_MESSAGE', [EnvironmentVariableTarget]::User) -match '!major') {
             [Environment]::SetEnvironmentVariable('BUMP_TAG', 'major', [EnvironmentVariableTarget]::User)
-          } elseif ((Get-Content -Path Env:COMMIT_MESSAGE) -match '!minor') {
+          } elseif ([Environment]::GetEnvironmentVariable('COMMIT_MESSAGE', [EnvironmentVariableTarget]::User) -match '!minor') {
             [Environment]::SetEnvironmentVariable('BUMP_TAG', 'minor', [EnvironmentVariableTarget]::User)
-          } elseif ((Get-Content -Path Env:COMMIT_MESSAGE) -match '!patch') {
+          } elseif ([Environment]::GetEnvironmentVariable('COMMIT_MESSAGE', [EnvironmentVariableTarget]::User) -match '!patch') {
             [Environment]::SetEnvironmentVariable('BUMP_TAG', 'patch', [EnvironmentVariableTarget]::User)
           } else {Exit(1)}
       
