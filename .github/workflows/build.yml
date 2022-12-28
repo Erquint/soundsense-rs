@@ -72,22 +72,22 @@ jobs:
           Compress-Archive -Path './target/release/*' -DestinationPath ('./artifacts/soundsense-rs-' + $env:VERSION_STRING + '-${{runner.os}}.zip')
       
       - name: Commit
-        if: runner.os == Linux
+        if: runner.os == 'Linux'
         run: |
           git add Cargo.toml
           git config --global user.name "A GitHub Workflow Runner"
           git commit -m ("Automated version bump to " + $env:VERSION_STRING)
       
       - name: Push commit
-        if: runner.os == Linux
+        if: runner.os == 'Linux'
         run: git push
         
       - name: Tag
-        if: runner.os == Linux
+        if: runner.os == 'Linux'
         run: git tag $env:VERSION_STRING
       
       - name: Push tag
-        if: runner.os == Linux
+        if: runner.os == 'Linux'
         run: git push origin $env:VERSION_STRING
       
       - name: Release
