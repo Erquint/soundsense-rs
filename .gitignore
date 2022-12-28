@@ -6,3 +6,5 @@
 /soundpack.zip
 /soundpack_tmp
 /ignore.txt
+/target/**
+/artifacts/**
