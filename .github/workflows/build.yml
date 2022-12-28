@@ -84,7 +84,7 @@ jobs:
         run: git tag $env:VERSION_STRING
       
       - name: Push tag
-        run: git push $env:VERSION_STRING
+        run: git push origin $env:VERSION_STRING
       
       - name: Release
         uses: softprops/action-gh-release@v1
