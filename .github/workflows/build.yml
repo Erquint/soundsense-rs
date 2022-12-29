@@ -75,7 +75,7 @@ jobs:
       
       - name: Package
         run: |
-          $EXTENSION = (${{runner.os}} -eq 'Windows') ? '.exe' : ''
+          $EXTENSION = ('${{runner.os}}' -eq 'Windows') ? '.exe' : ''
           New-Item -ItemType Directory -Path ./artifacts/; 
           Compress-Archive -Path "./target/release/soundsense-rs${EXTENSION}" -DestinationPath ("./artifacts/soundsense-rs-${env:VERSION_STRING}-${{runner.os}}.zip")
       
