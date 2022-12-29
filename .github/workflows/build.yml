@@ -29,6 +29,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       
+      - name: Configure user
+        run: |
+          git config --global user.name "GitHub Workflow Runner"
+          git config --global user.email "runner@github.azure"
+      
       - name: Get bump tag
         run: |
           $COMMIT_MESSAGE = (git show --no-patch --pretty=%s%n%b)
@@ -75,7 +80,6 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           git add Cargo.toml
-          git config --global user.name "A GitHub Workflow Runner"
           git commit -m ("Automated version bump to " + $env:VERSION_STRING)
       
       - name: Push commit
