@@ -32,6 +32,7 @@ fn main() {
         .init();
     info!("Starting SoundSense-RS");
     
+    
     // Setup getopts style argument handling.
     let args: Vec<String> = env::args().collect();
     let mut opts = getopts::Options::new();
